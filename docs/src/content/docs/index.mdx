@@ -1,0 +1,55 @@
+---
+title: beepr
+description: A tiny, typed event/notify engine — one handler contract, composable adapters, zero framework lock-in.
+template: splash
+hero:
+  tagline: A tiny, typed event/notify engine. One handler contract, composable adapters, zero framework lock-in.
+  actions:
+    - text: Read the introduction
+      link: /beepr/introduction/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/techmefr/beepr
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Install
+
+```bash
+pnpm add beepr
+```
+
+## Usage
+
+```ts
+import { createNotify, mergeEventHandlers } from 'beepr'
+
+const notify = createNotify({
+  onRequest:  ctx  => console.log('→', ctx.resource),
+  onSuccess:  data => console.log('ok', data),
+  onError:    err  => console.error(err.message),
+})
+
+// Combine a global handler with a per-call one — both fire
+const handler = mergeEventHandlers(globalNotify, notify)
+handler('success', { id: 1 })
+```
+
+<CardGrid>
+	<Card title="One handler contract" icon="rocket">
+		A single `SdkEventHandler` shape — `(event, data) => void` — across
+		`request · success · error · data · connected · disconnected`.
+	</Card>
+	<Card title="Typed adapters" icon="pencil">
+		`createNotify(adapter)` turns a typed `onSuccess`/`onError`/… object into
+		the raw handler shape, so call sites stay readable.
+	</Card>
+	<Card title="Zero framework lock-in" icon="puzzle">
+		Depends on nothing but `hookable`. Works as a standalone notification bus,
+		or as the event layer for [`nexdk`](/beepr/guides/pairing-with-nexdk/).
+	</Card>
+</CardGrid>

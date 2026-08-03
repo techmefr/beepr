@@ -38,6 +38,11 @@ Events: `request · success · error · data · connected · disconnected`.
 Useful on its own as a typed notification bus, or as the event layer for
 [`nexdk`](https://www.npmjs.com/package/nexdk).
 
+## Documentation
+
+Full docs, including how to pair `beepr` with `nexdk`, live at
+[techmefr.github.io/beepr](https://techmefr.github.io/beepr/).
+
 ## License
 
 MIT © techmefr
