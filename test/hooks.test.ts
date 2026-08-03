@@ -1,15 +1,15 @@
 import { describe, expect, it, vi } from 'vitest'
-import { createPilotaHooks, resolveEventHandler } from '../src/index.ts'
+import { createSdkHooks, resolveEventHandler } from '../src/index.ts'
 
-describe('createPilotaHooks', () => {
+describe('createSdkHooks', () => {
     it('creates a hooks instance with callHook and hook methods', () => {
-        const hooks = createPilotaHooks()
+        const hooks = createSdkHooks()
         expect(typeof hooks.hook).toBe('function')
         expect(typeof hooks.callHook).toBe('function')
     })
 
     it('fires registered global hooks on callHook', async () => {
-        const hooks = createPilotaHooks()
+        const hooks = createSdkHooks()
         const received: unknown[] = []
 
         hooks.hook('success', data => received.push(data))
@@ -19,7 +19,7 @@ describe('createPilotaHooks', () => {
     })
 
     it('can register multiple listeners for the same event', async () => {
-        const hooks = createPilotaHooks()
+        const hooks = createSdkHooks()
         let count = 0
 
         hooks.hook('error', () => count++)
@@ -32,7 +32,7 @@ describe('createPilotaHooks', () => {
 
 describe('resolveEventHandler — local priority', () => {
     it('returns the local handler directly when provided', () => {
-        const hooks = createPilotaHooks()
+        const hooks = createSdkHooks()
         const local = vi.fn()
 
         const handler = resolveEventHandler(local, hooks)
@@ -40,7 +40,7 @@ describe('resolveEventHandler — local priority', () => {
     })
 
     it('calls global hooks when no local handler is provided', async () => {
-        const hooks = createPilotaHooks()
+        const hooks = createSdkHooks()
         const globalSpy = vi.fn()
 
         hooks.hook('request', globalSpy)
@@ -52,7 +52,7 @@ describe('resolveEventHandler — local priority', () => {
     })
 
     it('does NOT call global hooks when a local handler is provided', async () => {
-        const hooks = createPilotaHooks()
+        const hooks = createSdkHooks()
         const globalSpy = vi.fn()
         const local = vi.fn()
 

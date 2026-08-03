@@ -13,7 +13,7 @@ pnpm add beepr
 
 ```ts
 import { createNotify, mergeEventHandlers } from 'beepr'
-import type { PilotaEvent, PilotaEventHandler } from 'beepr'
+import type { SdkEvent, SdkEventHandler } from 'beepr'
 
 // Turn a typed adapter into a raw (event, data) => void handler
 const notify = createNotify({
@@ -31,9 +31,9 @@ handler('success', { id: 1 })
 
 Events: `request · success · error · data · connected · disconnected`.
 
-- **`createNotify(adapter)`** → `PilotaEventHandler`.
+- **`createNotify(adapter)`** → `SdkEventHandler`.
 - **`mergeEventHandlers(a, b)`** — call both if both are defined.
-- **`createPilotaHooks()`** — a `hookable` instance typed with the event map.
+- **`createSdkHooks()`** — a `hookable` instance typed with the event map.
 
 Useful on its own as a typed notification bus, or as the event layer for
 [`nexdk`](https://www.npmjs.com/package/nexdk).

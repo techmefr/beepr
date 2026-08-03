@@ -1,13 +1,13 @@
-import type { PilotaEvent, PilotaEventHandler } from './types.ts'
-import type { PilotaHooksInstance } from './hooks.ts'
+import type { SdkEvent, SdkEventHandler } from './types.ts'
+import type { SdkHooksInstance } from './hooks.ts'
 
 export function resolveEventHandler(
-    local: PilotaEventHandler | undefined,
-    global: PilotaHooksInstance,
-): PilotaEventHandler {
+    local: SdkEventHandler | undefined,
+    global: SdkHooksInstance,
+): SdkEventHandler {
     if (local !== undefined) return local
 
-    return (event: PilotaEvent, data?: unknown) => {
+    return (event: SdkEvent, data?: unknown) => {
         void global.callHook(event, data)
     }
 }

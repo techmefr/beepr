@@ -1,4 +1,4 @@
-export type PilotaEvent =
+export type SdkEvent =
     | 'request'
     | 'success'
     | 'error'
@@ -6,4 +6,4 @@ export type PilotaEvent =
     | 'connected'
     | 'disconnected'
 
-export type PilotaEventHandler = (event: PilotaEvent, data?: unknown) => void
+export type SdkEventHandler = (event: SdkEvent, data?: unknown) => void

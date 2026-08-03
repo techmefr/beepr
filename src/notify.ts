@@ -1,6 +1,6 @@
-import type { PilotaEvent, PilotaEventHandler } from './types.ts'
+import type { SdkEvent, SdkEventHandler } from './types.ts'
 
-export type PilotaNotifyAdapter = {
+export type SdkNotifyAdapter = {
     onRequest?: (context: { resource?: string; payload?: unknown }) => void
     onSuccess?: (data?: unknown) => void
     onError?: (error: { message: string; errors?: Record<string, string[]> }) => void
@@ -9,8 +9,8 @@ export type PilotaNotifyAdapter = {
     onDisconnected?: (data?: unknown) => void
 }
 
-export function createNotify(adapter: PilotaNotifyAdapter): PilotaEventHandler {
-    return (event: PilotaEvent, data?: unknown) => {
+export function createNotify(adapter: SdkNotifyAdapter): SdkEventHandler {
+    return (event: SdkEvent, data?: unknown) => {
         if (event === 'request') {
             adapter.onRequest?.(data as { resource?: string; payload?: unknown } ?? {})
         }
