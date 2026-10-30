@@ -37,6 +37,7 @@
     "scripts": {
         "build": "unbuild",
         "test": "vitest run",
+        "typecheck": "tsc --noEmit",
         "dev": "unbuild --stub"
     },
     "dependencies": {
