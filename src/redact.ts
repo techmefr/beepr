@@ -10,6 +10,11 @@ export const SENSITIVE_FRAGMENTS: readonly string[] = [
     'privatekey',
     'sessionid',
     'bearer',
+    'pwd',
+    'jwt',
+    'auth',
+    'otp',
+    'signature',
 ]
 
 export const REDACTED = '[redacted]'
@@ -18,20 +23,33 @@ export const UNREADABLE = '[unreadable]'
 
 const MAX_DEPTH = 8
 
-const BEARER_VALUE = /^\s*(bearer|basic)\s+\S+/i
-const SENSITIVE_QUERY = /([?&](?:[\w-]*(?:token|secret|password|passwd|apikey|api_key|key)[\w-]*)=)[^&\s#]+/gi
+const BEARER_VALUE = /\b(bearer|basic)\s+[\w.~+/=-]+/gi
+const SENSITIVE_QUERY = /([?&](?:[\w-]*(?:token|secret|password|passwd|pwd|apikey|api_key|key)[\w-]*)=)[^&\s#]+/gi
+const SENSITIVE_ASSIGNMENT = /(\b[\w-]*(?:token|secret|password|passwd|pwd|apikey|api_key)[\w-]*\s*[=:]\s*)[^&\s#,;]+/gi
+const JWT_VALUE = /\beyJ[\w-]+\.[\w-]+\.[\w-]+/g
+const OTP_KEY = /(?:^|[^a-zA-Z0-9])(?:otp|OTP|Otp)(?:$|[^a-zA-Z0-9]|[A-Z])|[a-z0-9]Otp(?![a-z])|[a-z0-9]OTP/
+const WORD_FRAGMENTS = new Set(['otp'])
 
 const simplify = (name: string): string => name.toLowerCase().replace(/[^a-z0-9]/g, '')
 
+const LEADING_CREDENTIAL = /^\s*(bearer|basic)\s+\S+/i
+
 function scrub(value: string): string {
-    if (BEARER_VALUE.test(value)) return REDACTED
-    return value.replace(SENSITIVE_QUERY, `$1${REDACTED}`)
+    if (LEADING_CREDENTIAL.test(value)) return REDACTED
+    return value
+        .replace(BEARER_VALUE, `$1 ${REDACTED}`)
+        .replace(JWT_VALUE, REDACTED)
+        .replace(SENSITIVE_QUERY, `$1${REDACTED}`)
+        .replace(SENSITIVE_ASSIGNMENT, `$1${REDACTED}`)
 }
 
 export function createRedactor(extraKeys: readonly string[] = []): (value: unknown) => unknown {
-    const fragments = [...SENSITIVE_FRAGMENTS, ...extraKeys.map(simplify)].filter(fragment => fragment !== '')
+    const fragments = [...SENSITIVE_FRAGMENTS, ...extraKeys.map(simplify)].filter(
+        fragment => fragment !== '' && !WORD_FRAGMENTS.has(fragment),
+    )
     const isSensitive = (key: string): boolean => {
-        const simple = simplify(key)
+        if (OTP_KEY.test(key)) return true
+        const simple = simplify(key).replace(/author(?!iz)/g, '')
         return fragments.some(fragment => simple.includes(fragment))
     }
 
@@ -47,11 +65,19 @@ export function createRedactor(extraKeys: readonly string[] = []): (value: unkno
         if (typeof value === 'string') return scrub(value)
         if (value === null || typeof value !== 'object') return value
         if (depth >= MAX_DEPTH || seen.has(value)) return TRUNCATED
-        seen.add(value)
-        if (Array.isArray(value)) return value.map(item => walk(item, depth + 1, seen))
         if (value instanceof Date) return value
-        if (value instanceof Set) return [...value].map(item => walk(item, depth + 1, seen))
         if (value instanceof Error) return { name: value.name, message: scrub(value.message) }
+        seen.add(value)
+        try {
+            return walkObject(value, depth, seen)
+        } finally {
+            seen.delete(value)
+        }
+    }
+
+    const walkObject = (value: object, depth: number, seen: WeakSet<object>): unknown => {
+        if (Array.isArray(value)) return value.map(item => walk(item, depth + 1, seen))
+        if (value instanceof Set) return [...value].map(item => walk(item, depth + 1, seen))
         const entries: Array<[string, unknown]> =
             value instanceof Map
                 ? [...value].map(([key, nested]) => [String(key), nested])
