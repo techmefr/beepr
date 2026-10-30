@@ -7,7 +7,14 @@ export function mergeEventHandlers(
     if (global === undefined) return local
     if (local === undefined) return global
     return (event, data) => {
-        global(event, data)
-        local(event, data)
+        let failure: { error: unknown } | undefined
+        for (const handler of [global, local]) {
+            try {
+                handler(event, data)
+            } catch (error) {
+                failure ??= { error }
+            }
+        }
+        if (failure) throw failure.error
     }
 }

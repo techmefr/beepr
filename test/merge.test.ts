@@ -27,6 +27,22 @@ describe('mergeEventHandlers', () => {
         expect(local).toHaveBeenCalledWith('success', { ok: true })
     })
 
+    it('still calls local when global throws, then rethrows the first error', () => {
+        const local = vi.fn(() => { throw new Error('local') })
+        const merged = mergeEventHandlers(() => { throw new Error('global') }, local)
+
+        expect(() => merged?.('success')).toThrow('global')
+        expect(local).toHaveBeenCalledTimes(1)
+    })
+
+    it('rethrows the local error when only local throws', () => {
+        const global = vi.fn()
+        const merged = mergeEventHandlers(global, () => { throw new Error('local') })
+
+        expect(() => merged?.('success')).toThrow('local')
+        expect(global).toHaveBeenCalledTimes(1)
+    })
+
     it('calls global before local', () => {
         const order: string[] = []
         const global = vi.fn(() => order.push('global'))
