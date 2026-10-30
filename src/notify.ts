@@ -1,4 +1,4 @@
-import type { SdkEvent, SdkEventHandler } from './types.ts'
+import type { DebugEntry, SdkEvent, SdkEventHandler } from './types.ts'
 
 export type SdkNotifyAdapter = {
     onRequest?: (context: { resource?: string; payload?: unknown }) => void
@@ -7,6 +7,7 @@ export type SdkNotifyAdapter = {
     onData?: (data?: unknown) => void
     onConnected?: (data?: unknown) => void
     onDisconnected?: (data?: unknown) => void
+    onDebug?: (entry: DebugEntry) => void
 }
 
 export function createNotify(adapter: SdkNotifyAdapter): SdkEventHandler {
