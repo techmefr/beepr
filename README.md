@@ -1,5 +1,18 @@
 <p align="center">
-  <a href="https://techmefr.github.io/beepr/"><img src="docs/public/logo.png" alt="beepr" width="640"></a>
+  <a href="https://techmefr.github.io/beepr/"><img src="docs/public/banner.svg" alt="beepr" width="100%"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/techmefr/beepr/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/techmefr/beepr/ci.yml?branch=main&amp;style=flat-square"></a>
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-typed-3178c6?style=flat-square">
+  <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square"></a>
+</p>
+
+<p align="center">
+  <a href="https://techmefr.github.io/beepr/"><b>Documentation</b></a> ·
+  <a href="https://techmefr.github.io/beepr/getting-started/">Quickstart</a> ·
+  <a href="https://techmefr.github.io/beepr/reference/beepr/">API reference</a> ·
+  <a href="#ecosystem">Ecosystem</a>
 </p>
 
 # beepr
@@ -10,6 +23,15 @@ A tiny, typed event/notify engine. One handler contract, composable adapters,
 zero framework lock-in. Built on [`hookable`](https://github.com/unjs/hookable).
 
 > **Keywords** — `events` · `event-bus` · `notifications` · `pubsub` · `typescript` · `typed-events` · `hooks` · `hookable` · `adapters` · `framework-agnostic`
+
+## Why beepr
+
+| Feature | What you get |
+|---|---|
+| **One event contract** | Six typed event names shared by handlers, adapters and hooks. |
+| **Composable behavior** | Combine global and local handlers in a predictable order. |
+| **Multiple listeners** | Use hookable for subscriptions, cleanup and awaited dispatch. |
+| **Framework-independent** | Works on its own or as the notification layer beside neXdk. |
 
 ## Install
 
