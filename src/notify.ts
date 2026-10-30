@@ -1,3 +1,4 @@
+import { createRedactor } from './redact.ts'
 import type { DebugEntry, SdkEvent, SdkEventHandler } from './types.ts'
 
 export type SdkNotifyAdapter = {
@@ -10,26 +11,35 @@ export type SdkNotifyAdapter = {
     onDebug?: (entry: DebugEntry) => void
 }
 
-export function createNotify(adapter: SdkNotifyAdapter): SdkEventHandler {
-    return (event: SdkEvent, data?: unknown) => {
+export type NotifyOptions = {
+    redact?: boolean
+    redactKeys?: readonly string[]
+}
+
+export function createNotify(adapter: SdkNotifyAdapter, options: NotifyOptions = {}): SdkEventHandler {
+    const redactor = createRedactor(options.redactKeys)
+    const redact = options.redact === false ? (value: unknown): unknown => value : redactor
+
+    return (event: SdkEvent, rawData?: unknown) => {
         if (event === 'request') {
-            adapter.onRequest?.(data as { resource?: string; payload?: unknown } ?? {})
+            const context = (redact(rawData) as { resource?: string; payload?: unknown } | undefined) ?? {}
+            adapter.onRequest?.(context)
         }
         if (event === 'success') {
-            adapter.onSuccess?.(data)
+            adapter.onSuccess?.(redact(rawData))
         }
         if (event === 'error') {
-            const err = (data ?? {}) as { message?: string; errors?: Record<string, string[]> }
+            const err = (redact(rawData) ?? {}) as { message?: string; errors?: Record<string, string[]> }
             adapter.onError?.({ message: err.message ?? 'Unknown error', errors: err.errors })
         }
         if (event === 'data') {
-            adapter.onData?.(data)
+            adapter.onData?.(redact(rawData))
         }
         if (event === 'connected') {
-            adapter.onConnected?.(data)
+            adapter.onConnected?.(redact(rawData))
         }
         if (event === 'disconnected') {
-            adapter.onDisconnected?.(data)
+            adapter.onDisconnected?.(redact(rawData))
         }
     }
 }

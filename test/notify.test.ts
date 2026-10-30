@@ -40,3 +40,32 @@ describe('createNotify', () => {
         expect(() => notify('disconnected', {})).not.toThrow()
     })
 })
+
+describe('createNotify redaction', () => {
+    it('redacts request payload, error message and data before the adapter', () => {
+        const onRequest = vi.fn()
+        const onError = vi.fn()
+        const onData = vi.fn()
+        const notify = createNotify({ onRequest, onError, onData })
+
+        notify('request', { resource: 'users', payload: { password: 'x', name: 'n' } })
+        notify('error', { message: 'bad token=abc', errors: { f: ['Bearer zzz'] } })
+        notify('data', { token: 't', v: 1 })
+
+        expect(onRequest).toHaveBeenCalledWith({ resource: 'users', payload: { password: '[redacted]', name: 'n' } })
+        expect(onError).toHaveBeenCalledWith({ message: 'bad token=[redacted]', errors: { f: ['[redacted]'] } })
+        expect(onData).toHaveBeenCalledWith({ token: '[redacted]', v: 1 })
+    })
+
+    it('passes raw data when redaction is disabled', () => {
+        const onData = vi.fn()
+        createNotify({ onData }, { redact: false })('data', { token: 't' })
+        expect(onData).toHaveBeenCalledWith({ token: 't' })
+    })
+
+    it('honours extra redact keys', () => {
+        const onData = vi.fn()
+        createNotify({ onData }, { redactKeys: ['iban'] })('data', { iban: 'x' })
+        expect(onData).toHaveBeenCalledWith({ iban: '[redacted]' })
+    })
+})

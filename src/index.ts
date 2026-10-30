@@ -1,7 +1,7 @@
 export type { SdkEvent, SdkEventHandler } from './types.ts'
 export { mergeEventHandlers } from './merge.ts'
 export { createNotify } from './notify.ts'
-export type { SdkNotifyAdapter } from './notify.ts'
+export type { SdkNotifyAdapter, NotifyOptions } from './notify.ts'
 export { createSdkHooks } from './hooks.ts'
 export type { SdkHookMap, SdkHooksInstance } from './hooks.ts'
 export { resolveEventHandler } from './event-handler.ts'
