@@ -16,7 +16,13 @@
         "notify",
         "hookable",
         "typed",
-        "adapter"
+        "adapter",
+        "event-bus",
+        "notifications",
+        "pubsub",
+        "typescript",
+        "typed-events",
+        "framework-agnostic"
     ],
     "sideEffects": false,
     "exports": {

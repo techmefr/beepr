@@ -1,7 +1,15 @@
+<p align="center">
+  <a href="https://techmefr.github.io/beepr/"><img src="docs/public/logo.png" alt="beepr" width="640"></a>
+</p>
+
 # beepr
+
+**One signal. Every listener.**
 
 A tiny, typed event/notify engine. One handler contract, composable adapters,
 zero framework lock-in. Built on [`hookable`](https://github.com/unjs/hookable).
+
+> **Keywords** — `events` · `event-bus` · `notifications` · `pubsub` · `typescript` · `typed-events` · `hooks` · `hookable` · `adapters` · `framework-agnostic`
 
 ## Install
 
@@ -42,6 +50,16 @@ Useful on its own as a typed notification bus, or as the event layer for
 
 Full docs, including how to pair `beepr` with `nexdk`, live at
 [techmefr.github.io/beepr](https://techmefr.github.io/beepr/).
+
+## Ecosystem
+
+| Project | Role | Documentation |
+|---|---|---|
+| [neXdk](https://github.com/techmefr/nexdk) | One resource grammar for REST, GraphQL and WebSocket backends. | [Docs](https://techmefr.github.io/nexdk/) |
+| [beepr](https://github.com/techmefr/beepr) | Typed events and notification adapters. | [Docs](https://techmefr.github.io/beepr/) |
+| [shamock](https://github.com/techmefr/shamock) | Schema-validated mock data, fixtures and offline fallback. | [Docs](https://techmefr.github.io/shamock/) |
+
+Use each library on its own, or compose them in application code. neXdk does not depend on beepr or shamock.
 
 ## License
 

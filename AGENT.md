@@ -5,8 +5,8 @@ Standalone typed event/notify engine. Exposes `createNotify`,
 `mergeEventHandlers`, `createSdkHooks`, `resolveEventHandler`, and its own
 `SdkEvent`/`SdkEventHandler`/`SdkNotifyAdapter` types. Built on `hookable`.
 
-## Hard rule — independent of nexdk and chaff
-- **Never import `nexdk` or `chaff`.** beepr lives in its own repo now, but the
+## Hard rule — independent of nexdk and shamock
+- **Never import `nexdk` or `shamock`.** beepr lives in its own repo now, but the
   rule predates that: it keeps its OWN copy of the `SdkEvent` union and handler
   type — this duplication with nexdk is intentional (the price of
   independence). Keep the union members identical to nexdk's so

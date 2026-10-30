@@ -3,10 +3,14 @@ title: beepr
 description: A tiny, typed event/notify engine — one handler contract, composable adapters, zero framework lock-in.
 template: splash
 hero:
-  tagline: A tiny, typed event/notify engine. One handler contract, composable adapters, zero framework lock-in.
+  image:
+    light: ../../assets/logo.svg
+    dark: ../../assets/logo-dark.svg
+    alt: beepr logo
+  tagline: One signal. Every listener.
   actions:
-    - text: Read the introduction
-      link: /beepr/introduction/
+    - text: Get started
+      link: /beepr/getting-started/
       icon: right-arrow
       variant: primary
     - text: View on GitHub
@@ -16,6 +20,8 @@ hero:
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
+
+Typed events and composable notification adapters for your application.
 
 ## Install
 
@@ -53,3 +59,13 @@ handler('success', { id: 1 })
 		or as the event layer for [`nexdk`](/beepr/guides/pairing-with-nexdk/).
 	</Card>
 </CardGrid>
+
+## Ecosystem
+
+| Project | Role | Documentation |
+|---|---|---|
+| [neXdk](https://github.com/techmefr/nexdk) | One resource grammar for REST, GraphQL and WebSocket backends. | [Docs](https://techmefr.github.io/nexdk/) |
+| [beepr](https://github.com/techmefr/beepr) | Typed events and notification adapters. | [Docs](https://techmefr.github.io/beepr/) |
+| [shamock](https://github.com/techmefr/shamock) | Schema-validated mock data, fixtures and offline fallback. | [Docs](https://techmefr.github.io/shamock/) |
+
+Use each library on its own, or compose them in application code. neXdk does not depend on beepr or shamock.
