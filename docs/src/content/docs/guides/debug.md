@@ -25,7 +25,7 @@ debug.diagnostic('slow response', { ms: 1200 })
 [beepr:diagnostic] slow response { ms: 1200 }
 ```
 
-The console adapter uses `console.debug` for `trace` and `state`, and `console.warn` for `diagnostic`.
+The console adapter only implements `onDebug`: it is for `createDebug`, and `createNotify(createConsoleAdapter())` prints nothing. It uses `console.debug` for `trace` and `state`, and `console.warn` for `diagnostic`.
 
 ## Gating
 

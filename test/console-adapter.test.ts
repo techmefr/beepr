@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createConsoleAdapter } from '../src/console-adapter.ts'
+import { createNotify } from '../src/notify.ts'
 
 describe('createConsoleAdapter', () => {
     afterEach(() => vi.restoreAllMocks())
@@ -10,6 +11,18 @@ describe('createConsoleAdapter', () => {
         createConsoleAdapter().onDebug?.({ channel: 'diagnostic', label: 'l', data: { a: 1 } } as never)
         expect(warn).toHaveBeenCalledWith('[beepr:diagnostic] l', { a: 1 })
         expect(debug).not.toHaveBeenCalled()
+    })
+
+    it('implements onDebug only, so notify events print nothing', () => {
+        const spies = (['log', 'info', 'warn', 'error', 'debug'] as const).map(name =>
+            vi.spyOn(console, name).mockImplementation(() => {}),
+        )
+        const adapter = createConsoleAdapter()
+        expect(Object.keys(adapter)).toEqual(['onDebug'])
+        const notify = createNotify(adapter)
+        notify('success', { a: 1 })
+        notify('error', { message: 'boom', errors: { f: ['x'] } })
+        for (const spy of spies) expect(spy).not.toHaveBeenCalled()
     })
 
     it('routes other channels to console.debug', () => {

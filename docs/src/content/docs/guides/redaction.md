@@ -51,6 +51,8 @@ notify('success', { iban: 'FR76', name: 'Alice' })
 
 **Keys.** A key is masked when, ignoring case and separators, it contains one of: `password`, `passwd`, `secret`, `token`, `apikey`, `authorization`, `cookie`, `credential`, `privatekey`, `sessionid`, `bearer`, `pwd`, `jwt`, `auth`, `otp`, `signature`. So `access_token`, `clientSecret` and `Authorization-Header` are masked. `author` is kept. `otp` only matches as a word, so `hotpot` is kept.
 
+**Validation errors.** Under `errors` of an `error` event, field names are not matched: `errors: { password: ['too short'] }` reaches the adapter unchanged, as `Record<string, string[]>`. Each message is still redacted by value (see below), so a JWT or `Bearer ...` inside a message is masked. Other keys of the `error` payload follow the key rules.
+
 **Values.** Inside any string:
 
 - `Bearer ...` and `Basic ...`, anywhere in the text;

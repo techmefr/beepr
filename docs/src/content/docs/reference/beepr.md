@@ -15,7 +15,7 @@ Turns a typed adapter into a raw `SdkEventHandler`. Every payload is redacted fi
 |-------|------|----------|
 | `onRequest` | `(context: { resource?: string, payload?: unknown }) => void` | `'request'` (`{}` if no payload) |
 | `onSuccess` | `(data?: unknown) => void` | `'success'` |
-| `onError` | `(error: { message: string, errors?: Record<string, string[]> }) => void` | `'error'`; `message` defaults to `'Unknown error'` |
+| `onError` | `(error: { message: string, errors?: Record<string, string[]> }) => void` | `'error'`; `message` defaults to `'Unknown error'`; field names under `errors` are not redacted, messages are redacted by value |
 | `onData` | `(data?: unknown) => void` | `'data'` |
 | `onConnected` | `(data?: unknown) => void` | `'connected'` |
 | `onDisconnected` | `(data?: unknown) => void` | `'disconnected'` |
@@ -107,7 +107,7 @@ Defers data until debug is enabled.
 function createConsoleAdapter(): SdkNotifyAdapter
 ```
 
-Returns an adapter with `onDebug` only. Prints `[beepr:<channel>] <label>` plus data, with `console.warn` for `diagnostic` and `console.debug` otherwise.
+Returns an adapter with `onDebug` only: it is a debug-channel adapter. Passed alone to `createNotify`, it prints nothing for `request`, `success`, `error`, `data`, `connected` and `disconnected`; give it to `createDebug({ adapters })`, and write your own `onSuccess` and `onError` for notifications. It never prints outside the debug allow-list. Prints `[beepr:<channel>] <label>` plus data, with `console.warn` for `diagnostic` and `console.debug` otherwise.
 
 ## Types
 

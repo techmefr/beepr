@@ -84,6 +84,7 @@ notify('request', { resource: 'login', payload: { email: 'a@b.c', password: 'hun
 ```
 
 Options: `redact: false` turns it off, `redactKeys: ['iban']` masks extra keys.
+Field names under `errors` of an `error` event are not matched as sensitive keys; messages are still redacted by value.
 For standalone use, see `createRedactor`.
 
 ## Debug channel
@@ -118,7 +119,7 @@ debug.state('cart', { items: 3, token: 'abc' })
 | `createRedactor(extraKeys?)` | Standalone redaction function. |
 | `createDebug(options?)` | Environment-gated debug channels. |
 | `lazy(resolve)` | Defer expensive debug data until debug is enabled. |
-| `createConsoleAdapter()` | Prints debug entries to the console. |
+| `createConsoleAdapter()` | Debug-only adapter: prints debug entries, nothing for notify events. |
 
 Full details in the [API reference](https://techmefr.github.io/beepr/reference/beepr/).
 
