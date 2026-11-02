@@ -4,6 +4,9 @@
     "description": "Tiny typed event/notify engine — one handler contract, composable adapters.",
     "type": "module",
     "license": "MIT",
+    "engines": {
+        "node": ">=22"
+    },
     "author": "techmefr",
     "packageManager": "pnpm@11.9.0",
     "homepage": "https://github.com/techmefr/beepr#readme",
