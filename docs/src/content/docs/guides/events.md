@@ -1,6 +1,6 @@
 ---
 title: Events & adapters
-description: Dispatch the six supported events through one typed handler.
+description: Dispatch the seven supported events through one typed handler.
 ---
 
 ## One event contract
@@ -13,6 +13,7 @@ description: Dispatch the six supported events through one typed handler.
 | `success` | `onSuccess` | Completed operation. |
 | `error` | `onError` | Error messages and field errors. |
 | `data` | `onData` | Incoming subscription data. |
+| `complete` | `onComplete` | Subscription finished by the server. |
 | `connected` | `onConnected` | Connection established. |
 | `disconnected` | `onDisconnected` | Connection lost or closed. |
 

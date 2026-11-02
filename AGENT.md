@@ -17,7 +17,7 @@ Standalone typed event/notify engine built on `hookable`. Public exports:
 - Only runtime dependency allowed: `hookable`.
 
 ## Invariants
-- Every payload (`request`, `success`, `error`, `data`, `connected`, `disconnected`) goes through the redactor before reaching an adapter. Adapters get masked copies. `redact: false` is the only opt-out.
+- Every payload (`request`, `success`, `error`, `data`, `complete`, `connected`, `disconnected`) goes through the redactor before reaching an adapter. Adapters get masked copies. `redact: false` is the only opt-out.
 - Debug is off unless `environment` is in the `environments` allow-list (case and spaces ignored). Allow-list names starting with `prod`, `prd`, `live`, `release` or `stable` throw `DebugEnvironmentError`.
 - Under `errors` of an `error` event, field names are never matched as sensitive keys (messages stay `Record<string, string[]>`); each message is still redacted by value.
 - `createConsoleAdapter` implements `onDebug` only; it prints no notify event.

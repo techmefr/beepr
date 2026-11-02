@@ -17,6 +17,7 @@ Turns a typed adapter into a raw `SdkEventHandler`. Every payload is redacted fi
 | `onSuccess` | `(data?: unknown) => void` | `'success'` |
 | `onError` | `(error: { message: string, errors?: Record<string, string[]> }) => void` | `'error'`; `message` defaults to `'Unknown error'`; field names under `errors` are not redacted, messages are redacted by value |
 | `onData` | `(data?: unknown) => void` | `'data'` |
+| `onComplete` | `(data?: unknown) => void` | `'complete'` |
 | `onConnected` | `(data?: unknown) => void` | `'connected'` |
 | `onDisconnected` | `(data?: unknown) => void` | `'disconnected'` |
 | `onDebug` | `(entry: DebugEntry) => void` | Debug entries, see `createDebug` |
@@ -107,13 +108,13 @@ Defers data until debug is enabled.
 function createConsoleAdapter(): SdkNotifyAdapter
 ```
 
-Returns an adapter with `onDebug` only: it is a debug-channel adapter. Passed alone to `createNotify`, it prints nothing for `request`, `success`, `error`, `data`, `connected` and `disconnected`; give it to `createDebug({ adapters })`, and write your own `onSuccess` and `onError` for notifications. It never prints outside the debug allow-list. Prints `[beepr:<channel>] <label>` plus data, with `console.warn` for `diagnostic` and `console.debug` otherwise.
+Returns an adapter with `onDebug` only: it is a debug-channel adapter. Passed alone to `createNotify`, it prints nothing for `request`, `success`, `error`, `data`, `complete`, `connected` and `disconnected`; give it to `createDebug({ adapters })`, and write your own `onSuccess` and `onError` for notifications. It never prints outside the debug allow-list. Prints `[beepr:<channel>] <label>` plus data, with `console.warn` for `diagnostic` and `console.debug` otherwise.
 
 ## Types
 
 | Type | Role |
 |------|------|
-| `SdkEvent` | `'request' \| 'success' \| 'error' \| 'data' \| 'connected' \| 'disconnected'`. |
+| `SdkEvent` | `'request' \| 'success' \| 'error' \| 'data' \| 'complete' \| 'connected' \| 'disconnected'`. |
 | `SdkEventHandler` | `(event: SdkEvent, data?: unknown) => void`. |
 | `SdkNotifyAdapter` | The adapter object accepted by `createNotify`. |
 | `NotifyOptions` | `{ redact?: boolean, redactKeys?: readonly string[] }`. |

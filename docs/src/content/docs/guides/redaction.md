@@ -3,7 +3,7 @@ title: Redaction
 description: How beepr masks secrets before payloads reach adapters and debug output.
 ---
 
-`createNotify` redacts every payload before the adapter callback runs: `request`, `success`, `error`, `data`, `connected` and `disconnected`. Adapters receive masked copies. Your original objects are never changed.
+`createNotify` redacts every payload before the adapter callback runs: `request`, `success`, `error`, `data`, `complete`, `connected` and `disconnected`. Adapters receive masked copies. Your original objects are never changed.
 
 ```ts
 import { createNotify } from 'beepr'

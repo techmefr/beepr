@@ -3,6 +3,7 @@ export type SdkEvent =
     | 'success'
     | 'error'
     | 'data'
+    | 'complete'
     | 'connected'
     | 'disconnected'
 

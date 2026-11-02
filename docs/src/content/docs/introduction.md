@@ -5,7 +5,7 @@ description: Why beepr exists and what problem it solves.
 
 Most event systems tie you to a framework's own bus, or force every listener to match a raw `(event, data)` pair by hand. beepr separates two things:
 
-- **the event vocabulary**: `request`, `success`, `error`, `data`, `connected`, `disconnected`;
+- **the event vocabulary**: `request`, `success`, `error`, `data`, `complete`, `connected`, `disconnected`;
 - **the adapter**: a typed object (`onRequest`, `onSuccess`, `onError`...) that `createNotify` turns into a raw handler.
 
 On top of that, beepr adds two safety nets:

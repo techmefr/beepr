@@ -59,7 +59,7 @@ handler?.('success', { id: 1 })
 handler?.('error', { message: 'Failed' })
 ```
 
-Events: `request`, `success`, `error`, `data`, `connected`, `disconnected`.
+Events: `request`, `success`, `error`, `data`, `complete`, `connected`, `disconnected`.
 
 ## Redaction
 

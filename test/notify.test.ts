@@ -34,10 +34,29 @@ describe('createNotify', () => {
         expect(onDisconnected).toHaveBeenCalledWith({ resource: 'messages' })
     })
 
+    it('dispatches complete events to onComplete', () => {
+        const onComplete = vi.fn()
+        const notify = createNotify({ onComplete })
+
+        notify('complete', { resource: 'messages' })
+
+        expect(onComplete).toHaveBeenCalledWith({ resource: 'messages' })
+    })
+
+    it('redacts the complete payload', () => {
+        const onComplete = vi.fn()
+        const notify = createNotify({ onComplete })
+
+        notify('complete', { token: 't', v: 1 })
+
+        expect(onComplete).toHaveBeenCalledWith({ token: '[redacted]', v: 1 })
+    })
+
     it('does not throw when no handler is registered for an event', () => {
         const notify = createNotify({})
         expect(() => notify('connected', {})).not.toThrow()
         expect(() => notify('disconnected', {})).not.toThrow()
+        expect(() => notify('complete', {})).not.toThrow()
     })
 })
 

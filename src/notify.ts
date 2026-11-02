@@ -6,6 +6,7 @@ export type SdkNotifyAdapter = {
     onSuccess?: (data?: unknown) => void
     onError?: (error: { message: string; errors?: Record<string, string[]> }) => void
     onData?: (data?: unknown) => void
+    onComplete?: (data?: unknown) => void
     onConnected?: (data?: unknown) => void
     onDisconnected?: (data?: unknown) => void
     onDebug?: (entry: DebugEntry) => void
@@ -52,6 +53,9 @@ export function createNotify(adapter: SdkNotifyAdapter, options: NotifyOptions =
         }
         if (event === 'data') {
             adapter.onData?.(redact(rawData))
+        }
+        if (event === 'complete') {
+            adapter.onComplete?.(redact(rawData))
         }
         if (event === 'connected') {
             adapter.onConnected?.(redact(rawData))
