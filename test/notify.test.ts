@@ -57,6 +57,37 @@ describe('createNotify redaction', () => {
         expect(onData).toHaveBeenCalledWith({ token: '[redacted]', v: 1 })
     })
 
+    it('keeps validation messages under a sensitive field name as a string array', () => {
+        const onError = vi.fn()
+        createNotify({ onError })('error', {
+            message: 'Invalid',
+            errors: { password: ['too short', 'needs a digit'], token: ['expired'], email: ['required'] },
+        })
+        expect(onError).toHaveBeenCalledWith({
+            message: 'Invalid',
+            errors: { password: ['too short', 'needs a digit'], token: ['expired'], email: ['required'] },
+        })
+    })
+
+    it('still masks secrets found inside validation messages', () => {
+        const onError = vi.fn()
+        const jwt = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.c2lnbmF0dXJl'
+        createNotify({ onError })('error', {
+            message: 'Invalid',
+            errors: { password: [`bad ${jwt}`, 'Bearer abc', 'token=xyz'] },
+        })
+        expect(onError).toHaveBeenCalledWith({
+            message: 'Invalid',
+            errors: { password: ['bad [redacted]', '[redacted]', 'token=[redacted]'] },
+        })
+    })
+
+    it('still masks sensitive keys elsewhere in an error payload', () => {
+        const onError = vi.fn()
+        createNotify({ onError })('error', { message: 'x', errors: { a: ['b'] }, password: 'p' })
+        expect(onError).toHaveBeenCalledWith({ message: 'x', errors: { a: ['b'] } })
+    })
+
     it('passes raw data when redaction is disabled', () => {
         const onData = vi.fn()
         createNotify({ onData }, { redact: false })('data', { token: 't' })

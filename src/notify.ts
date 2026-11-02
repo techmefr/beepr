@@ -16,6 +16,23 @@ export type NotifyOptions = {
     redactKeys?: readonly string[]
 }
 
+function redactFieldErrors(
+    errors: Record<string, string[]> | undefined,
+    redact: (value: unknown) => unknown,
+): Record<string, string[]> | undefined {
+    if (errors === null || typeof errors !== 'object') return undefined
+    const result: Record<string, string[]> = {}
+    for (const [field, messages] of Object.entries(errors)) {
+        Object.defineProperty(result, field, {
+            value: redact(messages),
+            enumerable: true,
+            writable: true,
+            configurable: true,
+        })
+    }
+    return result
+}
+
 export function createNotify(adapter: SdkNotifyAdapter, options: NotifyOptions = {}): SdkEventHandler {
     const redactor = createRedactor(options.redactKeys)
     const redact = options.redact === false ? (value: unknown): unknown => value : redactor
@@ -29,8 +46,9 @@ export function createNotify(adapter: SdkNotifyAdapter, options: NotifyOptions =
             adapter.onSuccess?.(redact(rawData))
         }
         if (event === 'error') {
-            const err = (redact(rawData) ?? {}) as { message?: string; errors?: Record<string, string[]> }
-            adapter.onError?.({ message: err.message ?? 'Unknown error', errors: err.errors })
+            const { errors, ...rest } = (rawData ?? {}) as { message?: string; errors?: Record<string, string[]> }
+            const err = (redact(rest) ?? {}) as { message?: string }
+            adapter.onError?.({ message: err.message ?? 'Unknown error', errors: redactFieldErrors(errors, redact) })
         }
         if (event === 'data') {
             adapter.onData?.(redact(rawData))
