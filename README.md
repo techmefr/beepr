@@ -29,44 +29,98 @@ zero framework lock-in. Built on [`hookable`](https://github.com/unjs/hookable).
 | Feature | What you get |
 |---|---|
 | **One event contract** | Six typed event names shared by handlers, adapters and hooks. |
-| **Composable behavior** | Combine global and local handlers in a predictable order. |
-| **Multiple listeners** | Use hookable for subscriptions, cleanup and awaited dispatch. |
-| **Framework-independent** | Works on its own or as the notification layer beside neXdk. |
+| **Safe by default** | Every payload is redacted before it reaches an adapter. |
+| **Gated debug channel** | Debug output only runs in environments you allow, never in production. |
+| **Composable** | Merge handlers; one failing handler never blocks the other. |
+| **Independent** | Only depends on `hookable`. Works alone or beside neXdk. |
 
 ## Install
 
+beepr is not published to npm yet. Until then, install it from GitHub:
+
 ```bash
-pnpm add beepr
+pnpm add github:techmefr/beepr
 ```
 
 ## Usage
 
 ```ts
 import { createNotify, mergeEventHandlers } from 'beepr'
-import type { SdkEvent, SdkEventHandler } from 'beepr'
 
-// Turn a typed adapter into a raw (event, data) => void handler
-const notify = createNotify({
-  onRequest: ctx => console.log('→', ctx.resource),
+const global = createNotify({
+  onError: error => console.error('global', error.message),
+})
+const local = createNotify({
   onSuccess: data => console.log('ok', data),
-  onError:   err => console.error(err.message),
-  onConnected:    () => {},
-  onDisconnected: () => {},
 })
 
-// Combine a global handler with a per-call one (both fire)
-const handler = mergeEventHandlers(globalNotify, notify)
-handler('success', { id: 1 })
+const handler = mergeEventHandlers(global, local)
+handler?.('success', { id: 1 })
+handler?.('error', { message: 'Failed' })
 ```
 
-Events: `request · success · error · data · connected · disconnected`.
+Events: `request`, `success`, `error`, `data`, `connected`, `disconnected`.
 
-- **`createNotify(adapter)`** → `SdkEventHandler`.
-- **`mergeEventHandlers(a, b)`** — call both if both are defined.
-- **`createSdkHooks()`** — a `hookable` instance typed with the event map.
+## Redaction
 
-Useful on its own as a typed notification bus, or as the event layer for
-[`nexdk`](https://www.npmjs.com/package/nexdk).
+`createNotify(adapter, options?)` redacts every payload before the adapter sees it.
+Adapters get masked copies; your original data is never changed.
+
+```ts
+import { createNotify } from 'beepr'
+
+const notify = createNotify({
+  onRequest: context => console.log(context),
+})
+
+notify('request', { resource: 'login', payload: { email: 'a@b.c', password: 'hunter2' } })
+```
+
+```text
+{
+  resource: 'login',
+  payload: { email: 'a@b.c', password: '[redacted]' }
+}
+```
+
+Options: `redact: false` turns it off, `redactKeys: ['iban']` masks extra keys.
+For standalone use, see `createRedactor`.
+
+## Debug channel
+
+`createDebug` emits `trace`, `state` and `diagnostic` entries to adapters, only when
+the current environment is in your allow-list. Production-like names are refused.
+
+```ts
+import { createConsoleAdapter, createDebug } from 'beepr'
+
+const debug = createDebug({
+  environment: 'development',
+  environments: ['development', 'staging'],
+  adapters: [createConsoleAdapter()],
+})
+
+debug.state('cart', { items: 3, token: 'abc' })
+```
+
+```text
+[beepr:state] cart { items: 3, token: '[redacted]' }
+```
+
+## API
+
+| Export | Role |
+|---|---|
+| `createNotify(adapter, options?)` | Typed adapter to `SdkEventHandler`, with redaction. |
+| `mergeEventHandlers(global, local)` | Run both handlers, isolate failures, rethrow the first error. |
+| `createSdkHooks()` | A `hookable` instance typed with the six events. |
+| `resolveEventHandler(local, global)` | The local handler, or one that calls the global hooks. |
+| `createRedactor(extraKeys?)` | Standalone redaction function. |
+| `createDebug(options?)` | Environment-gated debug channels. |
+| `lazy(resolve)` | Defer expensive debug data until debug is enabled. |
+| `createConsoleAdapter()` | Prints debug entries to the console. |
+
+Full details in the [API reference](https://techmefr.github.io/beepr/reference/beepr/).
 
 ## Documentation
 
@@ -75,13 +129,13 @@ Full docs, including how to pair `beepr` with `nexdk`, live at
 
 ## Ecosystem
 
-| Project | Role | Documentation |
-|---|---|---|
-| [neXdk](https://github.com/techmefr/nexdk) | One resource grammar for REST, GraphQL and WebSocket backends. | [Docs](https://techmefr.github.io/nexdk/) |
-| [beepr](https://github.com/techmefr/beepr) | Typed events and notification adapters. | [Docs](https://techmefr.github.io/beepr/) |
-| [shamock](https://github.com/techmefr/shamock) | Schema-validated mock data, fixtures and offline fallback. | [Docs](https://techmefr.github.io/shamock/) |
+Each library works on its own. None of them depends on another.
 
-Use each library on its own, or compose them in application code. neXdk does not depend on beepr or shamock.
+| Project | Role |
+|---|---|
+| [nexdk](https://github.com/techmefr/nexdk) | One resource grammar for REST, GraphQL and WebSocket backends. |
+| [shamock](https://github.com/techmefr/shamock) | Schema-validated mock data, fixtures and offline fallback. |
+| [dialectr](https://github.com/techmefr/dialectr) | One query builder that compiles to lomkit, Strapi and PocketBase. |
 
 ## License
 

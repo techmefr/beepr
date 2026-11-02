@@ -3,33 +3,41 @@ title: beepr API reference
 description: Every runtime export of the beepr package.
 ---
 
-## `createNotify(adapter)`
+## `createNotify(adapter, options?)`
 
 ```ts
-function createNotify(adapter: SdkNotifyAdapter): SdkEventHandler
+function createNotify(adapter: SdkNotifyAdapter, options?: NotifyOptions): SdkEventHandler
 ```
 
-Turns a typed adapter into a raw `SdkEventHandler`. `adapter` fields, all optional:
+Turns a typed adapter into a raw `SdkEventHandler`. Every payload is redacted first. Adapter fields, all optional:
 
 | Field | Type | Fires on |
 |-------|------|----------|
-| `onRequest` | `(ctx: { resource?: string, payload?: unknown }) => void` | `'request'` |
+| `onRequest` | `(context: { resource?: string, payload?: unknown }) => void` | `'request'` (`{}` if no payload) |
 | `onSuccess` | `(data?: unknown) => void` | `'success'` |
-| `onError` | `(error: { message: string, errors?: Record<string, string[]> }) => void` | `'error'` — `message` defaults to `'Unknown error'` if the emitted data didn't carry one |
+| `onError` | `(error: { message: string, errors?: Record<string, string[]> }) => void` | `'error'`; `message` defaults to `'Unknown error'` |
 | `onData` | `(data?: unknown) => void` | `'data'` |
 | `onConnected` | `(data?: unknown) => void` | `'connected'` |
 | `onDisconnected` | `(data?: unknown) => void` | `'disconnected'` |
+| `onDebug` | `(entry: DebugEntry) => void` | Debug entries, see `createDebug` |
 
-## `mergeEventHandlers(a, b)`
+`NotifyOptions`:
+
+| Option | Type | Effect |
+|--------|------|--------|
+| `redact` | `boolean` | `false` disables redaction. |
+| `redactKeys` | `readonly string[]` | Extra key fragments to mask. |
+
+## `mergeEventHandlers(global, local)`
 
 ```ts
 function mergeEventHandlers(
-  a: SdkEventHandler | undefined,
-  b: SdkEventHandler | undefined,
+  global: SdkEventHandler | undefined,
+  local: SdkEventHandler | undefined,
 ): SdkEventHandler | undefined
 ```
 
-Combines two handlers into one. If either side is `undefined`, the other is returned untouched; otherwise both are invoked, in order (`a` then `b`).
+If one side is `undefined`, returns the other. Otherwise calls `global` then `local`. Each handler runs even if the other throws. The first error is rethrown afterwards.
 
 ## `createSdkHooks()`
 
@@ -37,18 +45,80 @@ Combines two handlers into one. If either side is `undefined`, the other is retu
 function createSdkHooks(): SdkHooksInstance
 ```
 
-Returns a [`hookable`](https://github.com/unjs/hookable) instance typed with the `SdkHookMap` — one hook per event name. Use it when you want `hookable`'s own API (multiple listeners, `hookOnce`, async hook chains) instead of a single flat handler.
+A [`hookable`](https://github.com/unjs/hookable) instance typed with `SdkHookMap`, one hook per event.
 
-## `resolveEventHandler(...)`
+## `resolveEventHandler(local, global)`
 
-Internal helper used by `createNotify` and `createSdkHooks` to normalize a handler/adapter into the raw event-dispatch shape. Exported for advanced use (e.g. building your own adapter-like abstraction), but most code should reach for `createNotify` or `createSdkHooks` directly.
+```ts
+function resolveEventHandler(
+  local: SdkEventHandler | undefined,
+  global: SdkHooksInstance,
+): SdkEventHandler
+```
+
+Returns `local` if defined. Otherwise returns a handler that calls `global.callHook(event, data)` without awaiting.
+
+## `createRedactor(extraKeys?)`
+
+```ts
+function createRedactor(extraKeys?: readonly string[]): (value: unknown) => unknown
+```
+
+Returns a function that makes a masked copy of any value. See [Redaction](/beepr/guides/redaction/).
+
+| Constant | Value |
+|----------|-------|
+| `REDACTED` | `'[redacted]'` |
+| `TRUNCATED` | `'[truncated]'` |
+| `UNREADABLE` | `'[unreadable]'` |
+| `SENSITIVE_FRAGMENTS` | Default key fragments (`readonly string[]`). |
+
+## `createDebug(options?)`
+
+```ts
+function createDebug(options?: DebugOptions): Debug
+```
+
+| Option | Type | Role |
+|--------|------|------|
+| `environment` | `string` | Current environment. |
+| `environments` | `readonly string[]` | Allow-list. Production-like names throw. |
+| `adapters` | `readonly SdkNotifyAdapter[]` | Receive entries via `onDebug`. |
+| `redact` | `readonly string[]` | Extra key fragments to mask. |
+| `onAdapterError` | `(failure: { name, message }) => void` | Called when an adapter throws. |
+
+`Debug` has `enabled: boolean` and the methods `trace`, `state` and `diagnostic`, each `(label: string, data?: unknown) => void`. See [Debug channel](/beepr/guides/debug/).
+
+## `DebugEnvironmentError`
+
+Thrown by `createDebug` for production-like allow-list names. `name` is `'DebugEnvironmentError'`.
+
+## `lazy(resolve)`
+
+```ts
+function lazy(resolve: () => unknown): LazyData
+```
+
+Defers data until debug is enabled.
+
+## `createConsoleAdapter()`
+
+```ts
+function createConsoleAdapter(): SdkNotifyAdapter
+```
+
+Returns an adapter with `onDebug` only. Prints `[beepr:<channel>] <label>` plus data, with `console.warn` for `diagnostic` and `console.debug` otherwise.
 
 ## Types
 
 | Type | Role |
 |------|------|
 | `SdkEvent` | `'request' \| 'success' \| 'error' \| 'data' \| 'connected' \| 'disconnected'`. |
-| `SdkEventHandler` | `(event: SdkEvent, data?: unknown) => void` — the raw handler shape every adapter compiles down to. |
-| `SdkNotifyAdapter` | The typed object `createNotify` accepts — see the field table above. |
-| `SdkHookMap` | The `hookable` hook map type used by `createSdkHooks`. |
-| `SdkHooksInstance` | The return type of `createSdkHooks`. |
+| `SdkEventHandler` | `(event: SdkEvent, data?: unknown) => void`. |
+| `SdkNotifyAdapter` | The adapter object accepted by `createNotify`. |
+| `NotifyOptions` | `{ redact?: boolean, redactKeys?: readonly string[] }`. |
+| `SdkHookMap` | The hook map used by `createSdkHooks`. |
+| `SdkHooksInstance` | Return type of `createSdkHooks`. |
+| `DebugChannel` | `'trace' \| 'state' \| 'diagnostic'`. |
+| `DebugEntry` | `{ readonly channel, readonly label, readonly data? }`. |
+| `DebugOptions`, `Debug`, `DebugData`, `DebugFailure`, `LazyData` | Debug types. |

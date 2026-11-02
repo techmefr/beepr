@@ -25,8 +25,10 @@ Typed events and composable notification adapters for your application.
 
 ## Install
 
+beepr is not published to npm yet. Install it from GitHub:
+
 ```bash
-pnpm add beepr
+pnpm add github:techmefr/beepr
 ```
 
 ## Usage
@@ -34,38 +36,40 @@ pnpm add beepr
 ```ts
 import { createNotify, mergeEventHandlers } from 'beepr'
 
-const notify = createNotify({
-  onRequest:  ctx  => console.log('→', ctx.resource),
-  onSuccess:  data => console.log('ok', data),
-  onError:    err  => console.error(err.message),
+const global = createNotify({
+  onError: error => console.error('global', error.message),
+})
+const local = createNotify({
+  onSuccess: data => console.log('ok', data),
 })
 
-// Combine a global handler with a per-call one — both fire
-const handler = mergeEventHandlers(globalNotify, notify)
-handler('success', { id: 1 })
+const handler = mergeEventHandlers(global, local)
+handler?.('success', { id: 1 })
 ```
 
 <CardGrid>
 	<Card title="One handler contract" icon="rocket">
-		A single `SdkEventHandler` shape — `(event, data) => void` — across
+		A single `SdkEventHandler` shape, `(event, data) => void`, for
 		`request · success · error · data · connected · disconnected`.
 	</Card>
-	<Card title="Typed adapters" icon="pencil">
-		`createNotify(adapter)` turns a typed `onSuccess`/`onError`/… object into
-		the raw handler shape, so call sites stay readable.
+	<Card title="Redacted by default" icon="approve-check">
+		Every payload is masked before it reaches an adapter. Secrets stay out of your logs.
+	</Card>
+	<Card title="Gated debug" icon="information">
+		Debug output only runs in environments you allow. Never in production.
 	</Card>
 	<Card title="Zero framework lock-in" icon="puzzle">
-		Depends on nothing but `hookable`. Works as a standalone notification bus,
-		or as the event layer for [`nexdk`](/beepr/guides/pairing-with-nexdk/).
+		Depends on nothing but `hookable`. Works alone, or beside
+		[`nexdk`](/beepr/guides/pairing-with-nexdk/).
 	</Card>
 </CardGrid>
 
 ## Ecosystem
 
-| Project | Role | Documentation |
-|---|---|---|
-| [neXdk](https://github.com/techmefr/nexdk) | One resource grammar for REST, GraphQL and WebSocket backends. | [Docs](https://techmefr.github.io/nexdk/) |
-| [beepr](https://github.com/techmefr/beepr) | Typed events and notification adapters. | [Docs](https://techmefr.github.io/beepr/) |
-| [shamock](https://github.com/techmefr/shamock) | Schema-validated mock data, fixtures and offline fallback. | [Docs](https://techmefr.github.io/shamock/) |
+Each library works on its own. None of them depends on another.
 
-Use each library on its own, or compose them in application code. neXdk does not depend on beepr or shamock.
+| Project | Role |
+|---|---|
+| [nexdk](https://github.com/techmefr/nexdk) | One resource grammar for REST, GraphQL and WebSocket backends. |
+| [shamock](https://github.com/techmefr/shamock) | Schema-validated mock data, fixtures and offline fallback. |
+| [dialectr](https://github.com/techmefr/dialectr) | One query builder that compiles to lomkit, Strapi and PocketBase. |

@@ -1,18 +1,29 @@
 # AGENT.md — beepr (event engine)
 
 ## Role
-Standalone typed event/notify engine. Exposes `createNotify`,
-`mergeEventHandlers`, `createSdkHooks`, `resolveEventHandler`, and its own
-`SdkEvent`/`SdkEventHandler`/`SdkNotifyAdapter` types. Built on `hookable`.
+Standalone typed event/notify engine built on `hookable`. Public exports:
+
+- `createNotify(adapter, options?)` with `NotifyOptions { redact, redactKeys }`
+- `mergeEventHandlers`, `createSdkHooks`, `resolveEventHandler`
+- `createRedactor`, `REDACTED`, `TRUNCATED`, `UNREADABLE`, `SENSITIVE_FRAGMENTS`
+- `createDebug`, `DebugEnvironmentError`, `lazy`, `createConsoleAdapter`
+- Types: `SdkEvent`, `SdkEventHandler`, `SdkNotifyAdapter`, `NotifyOptions`, `DebugChannel`, `DebugEntry`, `DebugOptions`, `Debug`
 
 ## Hard rule — independent of nexdk and shamock
-- **Never import `nexdk` or `shamock`.** beepr lives in its own repo now, but the
-  rule predates that: it keeps its OWN copy of the `SdkEvent` union and handler
-  type — this duplication with nexdk is intentional (the price of
-  independence). Keep the union members identical to nexdk's so
-  `createNotify(...)` stays assignable to `createSdk({ notify })`.
+- **Never import `nexdk` or `shamock`.** beepr keeps its OWN copy of the
+  `SdkEvent` union and handler type. This duplication is intentional. Keep the
+  union members identical to nexdk's so `createNotify(...)` stays assignable to
+  `createSdk({ notify })`.
 - Only runtime dependency allowed: `hookable`.
 
+## Invariants
+- Every payload (`request`, `success`, `error`, `data`, `connected`, `disconnected`) goes through the redactor before reaching an adapter. Adapters get masked copies. `redact: false` is the only opt-out.
+- Debug is off unless `environment` is in the `environments` allow-list (case and spaces ignored). Allow-list names starting with `prod`, `prd`, `live`, `release` or `stable` throw `DebugEnvironmentError`.
+- A disabled debug never evaluates `lazy` data and never writes to the console.
+- `mergeEventHandlers` runs both handlers, isolates each, rethrows the first error.
+- The redactor tracks only the current path: shared objects are not marked `[truncated]`, only cycles and depth over 8.
+
 ## Build/test
-`pnpm build` · `pnpm test`. No workspace, no sibling packages — this repo only
-ever builds/tests itself.
+`pnpm build` · `pnpm test` · `pnpm typecheck`. Docs: `pnpm --filter docs build`.
+No sibling packages — this repo only ever builds/tests itself.
+Docs are plain Markdown in `docs/src/content/docs`, sidebar in `docs/astro.config.mjs`. Code samples carry no comments.

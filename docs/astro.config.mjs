@@ -45,6 +45,14 @@ export default defineConfig({
                 "slug": "guides/events"
             },
             {
+                "label": "Redaction",
+                "slug": "guides/redaction"
+            },
+            {
+                "label": "Debug channel",
+                "slug": "guides/debug"
+            },
+            {
                 "label": "Compose handlers",
                 "slug": "guides/composition"
             },
@@ -79,8 +87,8 @@ export default defineConfig({
                 "link": "https://techmefr.github.io/shamock/"
             },
             {
-                "label": "HeryJs",
-                "link": "https://techmefr.github.io/HeryJs/"
+                "label": "dialectr",
+                "link": "https://github.com/techmefr/dialectr"
             }
         ]
     }

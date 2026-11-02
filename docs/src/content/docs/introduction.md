@@ -3,17 +3,22 @@ title: Introduction
 description: Why beepr exists and what problem it solves.
 ---
 
-Most event systems tie you to a framework's own event bus, or force every listener to pattern-match on a raw `(event, data)` pair by hand. `beepr` separates two things:
+Most event systems tie you to a framework's own bus, or force every listener to match a raw `(event, data)` pair by hand. beepr separates two things:
 
-- **the event vocabulary** — `request · success · error · data · connected · disconnected`, the same six events an async call or a reactive subscription can emit;
-- **the adapter** — a typed object (`onRequest`, `onSuccess`, `onError`…) that `createNotify` turns into the raw handler shape a caller expects.
+- **the event vocabulary**: `request`, `success`, `error`, `data`, `connected`, `disconnected`;
+- **the adapter**: a typed object (`onRequest`, `onSuccess`, `onError`...) that `createNotify` turns into a raw handler.
 
-The result: you write typed, readable event handlers, and the raw `SdkEventHandler` shape — the thing a caller like [`nexdk`](https://github.com/techmefr/nexdk) actually invokes — is generated for you.
+On top of that, beepr adds two safety nets:
+
+- **redaction**: payloads are masked before adapters see them;
+- **debug gating**: debug output only runs in environments you allow.
 
 ## Install
 
+beepr is not published to npm yet. Install it from GitHub:
+
 ```bash
-npm install beepr
+pnpm add github:techmefr/beepr
 ```
 
 ## A minimal example
@@ -22,16 +27,18 @@ npm install beepr
 import { createNotify } from 'beepr'
 
 const notify = createNotify({
-  onRequest: (ctx) => console.log('→', ctx.resource, ctx.payload),
-  onSuccess: (data) => console.log('✓', data),
-  onError: (err) => console.error('✗', err.message),
+  onRequest: context => console.log('request', context.resource),
+  onSuccess: data => console.log('success', data),
+  onError: error => console.error('error', error.message),
 })
 
 notify('request', { resource: 'users', payload: { id: 1 } })
 notify('success', { id: 1, name: 'Alice' })
 ```
 
-From here:
+## Next
 
-- [Pairing with nexdk](/beepr/guides/pairing-with-nexdk/) — how `beepr` plugs into an `nexdk` SDK without either depending on the other.
-- [beepr API](/beepr/reference/beepr/) — every runtime export.
+- [Redaction](/beepr/guides/redaction/): what gets masked.
+- [Debug channel](/beepr/guides/debug/): environment-gated diagnostics.
+- [Pairing with nexdk](/beepr/guides/pairing-with-nexdk/): use beepr as nexdk's `notify`.
+- [beepr API](/beepr/reference/beepr/): every runtime export.

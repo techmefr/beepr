@@ -3,10 +3,10 @@ title: Installation & quickstart
 description: Install beepr and dispatch your first typed event.
 ---
 
-Install the standalone event engine:
+beepr is not published to npm yet. Install it from GitHub:
 
 ```bash
-pnpm add beepr
+pnpm add github:techmefr/beepr
 ```
 
 Create an adapter and emit events through the returned handler:
@@ -25,6 +25,6 @@ notify('success', [{ id: 1, name: 'Sample' }])
 notify('error', { message: 'Could not load products' })
 ```
 
-Only implement the callbacks you need. beepr routes event names to the corresponding callback; your application decides when to emit them.
+Only implement the callbacks you need. beepr routes each event name to its callback. Your application decides when to emit.
 
-Continue with [events and adapters](/beepr/guides/events/), [handler composition](/beepr/guides/composition/) or [multiple listeners](/beepr/guides/hooks/).
+Next: [events and adapters](/beepr/guides/events/), [redaction](/beepr/guides/redaction/), [handler composition](/beepr/guides/composition/), [multiple listeners](/beepr/guides/hooks/) or the [debug channel](/beepr/guides/debug/).
