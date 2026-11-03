@@ -1,38 +1,21 @@
 import { describe, expect, it, vi } from 'vitest'
-import { createSdkHooks, resolveEventHandler } from '../src/index.ts'
+import { resolveEventHandler } from '../src/index.ts'
 
-describe('createSdkHooks', () => {
-    it('creates a hooks instance with callHook and hook methods', () => {
-        const hooks = createSdkHooks()
-        expect(typeof hooks.hook).toBe('function')
-        expect(typeof hooks.callHook).toBe('function')
-    })
-
-    it('fires registered global hooks on callHook', async () => {
-        const hooks = createSdkHooks()
-        const received: unknown[] = []
-
-        hooks.hook('success', data => received.push(data))
-        await hooks.callHook('success', { result: 'ok' })
-
-        expect(received).toEqual([{ result: 'ok' }])
-    })
-
-    it('can register multiple listeners for the same event', async () => {
-        const hooks = createSdkHooks()
-        let count = 0
-
-        hooks.hook('error', () => count++)
-        hooks.hook('error', () => count++)
-        await hooks.callHook('error', {})
-
-        expect(count).toBe(2)
-    })
-})
+function createHooks() {
+    const listeners = new Map<string, Array<(data?: unknown) => void>>()
+    return {
+        hook: (event: string, listener: (data?: unknown) => void) => {
+            listeners.set(event, [...(listeners.get(event) ?? []), listener])
+        },
+        callHook: async (event: string, data?: unknown) => {
+            for (const listener of listeners.get(event) ?? []) listener(data)
+        },
+    }
+}
 
 describe('resolveEventHandler — local priority', () => {
     it('returns the local handler directly when provided', () => {
-        const hooks = createSdkHooks()
+        const hooks = createHooks()
         const local = vi.fn()
 
         const handler = resolveEventHandler(local, hooks)
@@ -40,7 +23,7 @@ describe('resolveEventHandler — local priority', () => {
     })
 
     it('calls global hooks when no local handler is provided', async () => {
-        const hooks = createSdkHooks()
+        const hooks = createHooks()
         const globalSpy = vi.fn()
 
         hooks.hook('request', globalSpy)
@@ -52,7 +35,7 @@ describe('resolveEventHandler — local priority', () => {
     })
 
     it('does NOT call global hooks when a local handler is provided', async () => {
-        const hooks = createSdkHooks()
+        const hooks = createHooks()
         const globalSpy = vi.fn()
         const local = vi.fn()
 

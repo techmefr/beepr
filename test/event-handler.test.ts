@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { resolveEventHandler } from '../src/event-handler.ts'
-import type { SdkHooksInstance } from '../src/hooks.ts'
+import type { HookCaller as SdkHooksInstance } from '../src/event-handler.ts'
 
 describe('resolveEventHandler', () => {
     it('returns the local handler when provided', () => {

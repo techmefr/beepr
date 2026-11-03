@@ -38,4 +38,4 @@ Callbacks are optional. An error event without a message becomes `Unknown error`
 
 Every payload is [redacted](/beepr/guides/redaction/) before the callback runs.
 
-The handler calls callbacks synchronously and does not await async work. For an awaited chain, use [hooks](/beepr/guides/hooks/).
+The handler calls callbacks synchronously and does not await async work.

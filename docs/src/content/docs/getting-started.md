@@ -27,4 +27,4 @@ notify('error', { message: 'Could not load products' })
 
 Only implement the callbacks you need. beepr routes each event name to its callback. Your application decides when to emit.
 
-Next: [events and adapters](/beepr/guides/events/), [redaction](/beepr/guides/redaction/), [handler composition](/beepr/guides/composition/), [multiple listeners](/beepr/guides/hooks/) or the [debug channel](/beepr/guides/debug/).
+Next: [events and adapters](/beepr/guides/events/), [redaction](/beepr/guides/redaction/), [handler composition](/beepr/guides/composition/) or the [debug channel](/beepr/guides/debug/).

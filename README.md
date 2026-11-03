@@ -20,19 +20,19 @@
 **One signal. Every listener.**
 
 A tiny, typed event/notify engine. One handler contract, composable adapters,
-zero framework lock-in. Built on [`hookable`](https://github.com/unjs/hookable).
+zero framework lock-in, zero dependency.
 
-> **Keywords** — `events` · `event-bus` · `notifications` · `pubsub` · `typescript` · `typed-events` · `hooks` · `hookable` · `adapters` · `framework-agnostic`
+> **Keywords** — `events` · `event-bus` · `notifications` · `pubsub` · `typescript` · `typed-events` · `adapters` · `framework-agnostic`
 
 ## Why beepr
 
 | Feature | What you get |
 |---|---|
-| **One event contract** | Six typed event names shared by handlers, adapters and hooks. |
+| **One event contract** | Six typed event names shared by handlers and adapters. |
 | **Safe by default** | Every payload is redacted before it reaches an adapter. |
 | **Gated debug channel** | Debug output only runs in environments you allow, never in production. |
 | **Composable** | Merge handlers; one failing handler never blocks the other. |
-| **Independent** | Only depends on `hookable`. Works alone or beside neXdk. |
+| **Independent** | No runtime dependency. Works alone or beside neXdk. |
 
 ## Install
 
@@ -114,8 +114,7 @@ debug.state('cart', { items: 3, token: 'abc' })
 |---|---|
 | `createNotify(adapter, options?)` | Typed adapter to `SdkEventHandler`, with redaction. |
 | `mergeEventHandlers(global, local)` | Run both handlers, isolate failures, rethrow the first error. |
-| `createSdkHooks()` | A `hookable` instance typed with the six events. |
-| `resolveEventHandler(local, global)` | The local handler, or one that calls the global hooks. |
+| `resolveEventHandler(local, global)` | The local handler, or one that calls `global.callHook(event, data)`. |
 | `createRedactor(extraKeys?)` | Standalone redaction function. |
 | `createDebug(options?)` | Environment-gated debug channels. |
 | `lazy(resolve)` | Defer expensive debug data until debug is enabled. |

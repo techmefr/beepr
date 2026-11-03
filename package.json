@@ -17,7 +17,6 @@
     "keywords": [
         "events",
         "notify",
-        "hookable",
         "typed",
         "adapter",
         "event-bus",
@@ -48,9 +47,6 @@
         "test": "vitest run",
         "typecheck": "tsc --noEmit",
         "dev": "unbuild --stub"
-    },
-    "dependencies": {
-        "hookable": "^5.5.3"
     },
     "devDependencies": {
         "unbuild": "^2.0.0",

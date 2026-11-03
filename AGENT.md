@@ -1,10 +1,10 @@
 # AGENT.md — beepr (event engine)
 
 ## Role
-Standalone typed event/notify engine built on `hookable`. Public exports:
+Standalone typed event/notify engine with no runtime dependency. Public exports:
 
 - `createNotify(adapter, options?)` with `NotifyOptions { redact, redactKeys }`
-- `mergeEventHandlers`, `createSdkHooks`, `resolveEventHandler`
+- `mergeEventHandlers`, `resolveEventHandler` (takes any `HookCaller { callHook }`)
 - `createRedactor`, `REDACTED`, `TRUNCATED`, `UNREADABLE`, `SENSITIVE_FRAGMENTS`
 - `createDebug`, `DebugEnvironmentError`, `lazy`, `createConsoleAdapter`
 - Types: `SdkEvent`, `SdkEventHandler`, `SdkNotifyAdapter`, `NotifyOptions`, `DebugChannel`, `DebugEntry`, `DebugOptions`, `Debug`
@@ -14,7 +14,7 @@ Standalone typed event/notify engine built on `hookable`. Public exports:
   `SdkEvent` union and handler type. This duplication is intentional. Keep the
   union members identical to nexdk's so `createNotify(...)` stays assignable to
   `createSdk({ notify })`.
-- Only runtime dependency allowed: `hookable`.
+- No runtime dependency.
 
 ## Invariants
 - Every payload (`request`, `success`, `error`, `data`, `complete`, `connected`, `disconnected`) goes through the redactor before reaching an adapter. Adapters get masked copies. `redact: false` is the only opt-out.

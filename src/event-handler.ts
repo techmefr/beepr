@@ -1,9 +1,12 @@
 import type { SdkEvent, SdkEventHandler } from './types.ts'
-import type { SdkHooksInstance } from './hooks.ts'
+
+export interface HookCaller {
+    callHook: (event: SdkEvent, data?: unknown) => unknown
+}
 
 export function resolveEventHandler(
     local: SdkEventHandler | undefined,
-    global: SdkHooksInstance,
+    global: HookCaller,
 ): SdkEventHandler {
     if (local !== undefined) return local
 

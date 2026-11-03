@@ -40,20 +40,12 @@ function mergeEventHandlers(
 
 If one side is `undefined`, returns the other. Otherwise calls `global` then `local`. Each handler runs even if the other throws. The first error is rethrown afterwards.
 
-## `createSdkHooks()`
-
-```ts
-function createSdkHooks(): SdkHooksInstance
-```
-
-A [`hookable`](https://github.com/unjs/hookable) instance typed with `SdkHookMap`, one hook per event.
-
 ## `resolveEventHandler(local, global)`
 
 ```ts
 function resolveEventHandler(
   local: SdkEventHandler | undefined,
-  global: SdkHooksInstance,
+  global: HookCaller,
 ): SdkEventHandler
 ```
 
@@ -118,8 +110,7 @@ Returns an adapter with `onDebug` only: it is a debug-channel adapter. Passed al
 | `SdkEventHandler` | `(event: SdkEvent, data?: unknown) => void`. |
 | `SdkNotifyAdapter` | The adapter object accepted by `createNotify`. |
 | `NotifyOptions` | `{ redact?: boolean, redactKeys?: readonly string[] }`. |
-| `SdkHookMap` | The hook map used by `createSdkHooks`. |
-| `SdkHooksInstance` | Return type of `createSdkHooks`. |
+| `HookCaller` | `{ callHook(event, data?) }`, accepted by `resolveEventHandler` (a `hookable` instance fits). |
 | `DebugChannel` | `'trace' \| 'state' \| 'diagnostic'`. |
 | `DebugEntry` | `{ readonly channel, readonly label, readonly data? }`. |
 | `DebugOptions`, `Debug`, `DebugData`, `DebugFailure`, `LazyData` | Debug types. |

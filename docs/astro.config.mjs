@@ -57,10 +57,6 @@ export default defineConfig({
                 "slug": "guides/composition"
             },
             {
-                "label": "Multiple listeners",
-                "slug": "guides/hooks"
-            },
-            {
                 "label": "Pairing with neXdk",
                 "slug": "guides/pairing-with-nexdk"
             }
