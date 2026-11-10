@@ -1,4 +1,4 @@
-export type { SdkEvent, SdkEventHandler } from './types.ts'
+export type { CallContext, ErrorContext, ErrorKind, RequestContext, SdkEvent, SdkEventHandler, SuccessContext } from './types.ts'
 export { mergeEventHandlers } from './merge.ts'
 export { createNotify } from './notify.ts'
 export type { SdkNotifyAdapter, NotifyOptions } from './notify.ts'
