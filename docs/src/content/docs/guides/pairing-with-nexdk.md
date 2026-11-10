@@ -10,9 +10,9 @@ import { createNotify } from 'beepr'
 import { createSdk } from 'nexdk'
 
 const notify = createNotify({
-  onRequest: context => console.log('request', context.resource),
-  onSuccess: data => console.log('success', data),
-  onError: error => console.error('error', error.message),
+  onRequest: ({ resource, method }) => console.log('request', resource, method),
+  onSuccess: ({ resource, method, data }) => console.log('success', resource, method, data),
+  onError: ({ status, kind, message }) => console.error(kind === 'timeout' ? 'Too slow' : `${status} ${message}`),
 })
 
 const sdk = createSdk({
@@ -20,6 +20,8 @@ const sdk = createSdk({
   notify,
 })
 ```
+
+nexdk emits `request` as `{ resource, method, payload }`, `success` as `{ resource, method, data }` and `error` as `{ message, status, errors, kind, resource, method }`: beepr types them as `RequestContext`, `SuccessContext` and `ErrorContext` without importing nexdk.
 
 The duplication is intentional: it is the price of independence. nexdk exports its own types, so you never need beepr just to type a handler. Use beepr when you want a typed adapter, redaction and composition instead of matching the raw `(event, data)` pair yourself.
 

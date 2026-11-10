@@ -13,9 +13,9 @@ Turns a typed adapter into a raw `SdkEventHandler`. Every payload is redacted fi
 
 | Field | Type | Fires on |
 |-------|------|----------|
-| `onRequest` | `(context: { resource?: string, payload?: unknown }) => void` | `'request'` (`{}` if no payload) |
-| `onSuccess` | `(data?: unknown) => void` | `'success'` |
-| `onError` | `(error: { message: string, errors?: Record<string, string[]> }) => void` | `'error'`; `message` defaults to `'Unknown error'`; field names under `errors` are not redacted, messages are redacted by value |
+| `onRequest` | `(context: RequestContext) => void` | `'request'` (`{}` if no payload) |
+| `onSuccess` | `(context: SuccessContext) => void` | `'success'`; the payload is passed as is |
+| `onError` | `(error: ErrorContext) => void` | `'error'`; `message` defaults to `'Unknown error'`; `status`, `kind`, `resource`, `method` are copied when they have the right type; field names under `errors` are not redacted, messages are redacted by value |
 | `onData` | `(data?: unknown) => void` | `'data'` |
 | `onComplete` | `(data?: unknown) => void` | `'complete'` |
 | `onConnected` | `(data?: unknown) => void` | `'connected'` |
@@ -110,6 +110,11 @@ Returns an adapter with `onDebug` only: it is a debug-channel adapter. Passed al
 | `SdkEventHandler` | `(event: SdkEvent, data?: unknown) => void`. |
 | `SdkNotifyAdapter` | The adapter object accepted by `createNotify`. |
 | `NotifyOptions` | `{ redact?: boolean, redactKeys?: readonly string[] }`. |
+| `CallContext` | `{ resource?: string, method?: string }`. |
+| `RequestContext` | `CallContext & { payload?: unknown }`. |
+| `SuccessContext` | `CallContext & { data?: unknown }`. |
+| `ErrorContext` | `CallContext & { message: string, errors?: Record<string, string[]>, status?: number, kind?: ErrorKind }`. |
+| `ErrorKind` | `'timeout' \| 'abort' \| 'network' \| 'http'`. |
 | `HookCaller` | `{ callHook(event, data?) }`, accepted by `resolveEventHandler` (a `hookable` instance fits). |
 | `DebugChannel` | `'trace' \| 'state' \| 'diagnostic'`. |
 | `DebugEntry` | `{ readonly channel, readonly label, readonly data? }`. |

@@ -48,18 +48,18 @@ pnpm add github:techmefr/beepr
 import { createNotify, mergeEventHandlers } from 'beepr'
 
 const global = createNotify({
-  onError: error => console.error('global', error.message),
+  onError: ({ status, kind, resource, method, message }) => console.error(status, kind, resource, method, message),
 })
 const local = createNotify({
-  onSuccess: data => console.log('ok', data),
+  onSuccess: ({ resource, method, data }) => console.log('ok', resource, method, data),
 })
 
 const handler = mergeEventHandlers(global, local)
-handler?.('success', { id: 1 })
-handler?.('error', { message: 'Failed' })
+handler?.('success', { resource: 'users', method: 'get', data: { id: 1 } })
+handler?.('error', { message: 'Failed', status: 0, kind: 'timeout', resource: 'users', method: 'get' })
 ```
 
-Events: `request`, `success`, `error`, `data`, `complete`, `connected`, `disconnected`.
+Events: `request`, `success`, `error`, `data`, `complete`, `connected`, `disconnected`. With nexdk, `onRequest`, `onSuccess` and `onError` also get `resource` and `method`, and `onError` gets `status` and `kind` (`timeout`, `abort`, `network`, `http`).
 
 ## Redaction
 
