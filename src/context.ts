@@ -7,10 +7,13 @@ const TYPED_FIELDS: Record<string, string> = {
     kind: 'string',
 }
 
+const ERROR_KINDS: readonly unknown[] = ['timeout', 'abort', 'network', 'http']
+
 function normalized(source: Record<string, unknown>): Record<string, unknown> {
     const result: Record<string, unknown> = {}
     for (const [key, value] of Object.entries(source)) {
         const expected = TYPED_FIELDS[key]
+        if (key === 'kind' && !ERROR_KINDS.includes(value)) continue
         if (expected === undefined || typeof value === expected) result[key] = value
     }
     return result

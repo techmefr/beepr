@@ -50,6 +50,12 @@ describe('createNotify call context', () => {
         expect(Object.keys(onError.mock.calls[0][0]).sort()).toEqual(['errors', 'message'])
     })
 
+    it('drops a kind outside timeout, abort, network and http', () => {
+        const onError = vi.fn<(error: ErrorContext) => void>()
+        createNotify({ onError })('error', { message: 'x', kind: 'teapot' })
+        expect(onError.mock.calls[0][0]).toEqual({ message: 'x', errors: undefined })
+    })
+
     it('keeps a handler typed with the old signatures assignable', () => {
         const legacy = { onSuccess: (data?: unknown) => void data, onError: (error: { message: string }) => void error }
         expect(() => createNotify(legacy)('success', 1)).not.toThrow()
