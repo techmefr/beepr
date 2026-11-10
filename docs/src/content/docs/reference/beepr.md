@@ -13,14 +13,18 @@ Turns a typed adapter into a raw `SdkEventHandler`. Every payload is redacted fi
 
 | Field | Type | Fires on |
 |-------|------|----------|
-| `onRequest` | `(context: RequestContext) => void` | `'request'` (`{}` if no payload) |
-| `onSuccess` | `(context: SuccessContext) => void` | `'success'`; the payload is passed as is |
+| `onRequest` | `(context: RequestContext) => void` | `'request'`; an object payload is the context, any other payload becomes `{ payload }`, no payload gives `{}` |
+| `onSuccess` | `(context: SuccessContext) => void` | `'success'`; an object payload is the context, any other payload becomes `{ data }`, no payload gives `{}` |
 | `onError` | `(error: ErrorContext) => void` | `'error'`; `message` defaults to `'Unknown error'`; `status`, `kind`, `resource`, `method` are copied when they have the right type; field names under `errors` are not redacted, messages are redacted by value |
 | `onData` | `(data?: unknown) => void` | `'data'` |
 | `onComplete` | `(data?: unknown) => void` | `'complete'` |
 | `onConnected` | `(data?: unknown) => void` | `'connected'` |
 | `onDisconnected` | `(data?: unknown) => void` | `'disconnected'` |
 | `onDebug` | `(entry: DebugEntry) => void` | Debug entries, see `createDebug` |
+
+In the three contexts, `resource`, `method`, `kind` (strings) and `status` (number) are dropped when they have another type; the other keys of a request or success object are kept. The error context keeps only its typed fields, `message` and `errors`.
+
+**Breaking change** (since the call context commit): `onSuccess` used to receive the raw payload, it now receives a `SuccessContext`. A handler written as `onSuccess: (data) => ...` for a non-nexdk emitter must read `data.data` for a non-object payload.
 
 `NotifyOptions`:
 

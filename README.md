@@ -59,7 +59,9 @@ handler?.('success', { resource: 'users', method: 'get', data: { id: 1 } })
 handler?.('error', { message: 'Failed', status: 0, kind: 'timeout', resource: 'users', method: 'get' })
 ```
 
-Events: `request`, `success`, `error`, `data`, `complete`, `connected`, `disconnected`. With nexdk, `onRequest`, `onSuccess` and `onError` also get `resource` and `method`, and `onError` gets `status` and `kind` (`timeout`, `abort`, `network`, `http`).
+Events: `request`, `success`, `error`, `data`, `complete`, `connected`, `disconnected`. With nexdk, `onRequest`, `onSuccess` and `onError` also get `resource` and `method`, and `onError` gets `status` and `kind` (`timeout`, `abort`, `network`, `http`). A non-object payload reaches `onRequest` as `{ payload }` and `onSuccess` as `{ data }`.
+
+**Breaking change** (since the call context commit): `onSuccess` used to receive the raw payload, it now receives a `SuccessContext`. A handler written as `onSuccess: (data) => ...` for a non-nexdk emitter must read `data.data` for a non-object payload.
 
 ## Redaction
 

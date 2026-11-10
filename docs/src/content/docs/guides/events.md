@@ -34,7 +34,9 @@ const notify = createNotify({
 notify('error', { message: 'Validation failed', errors: { name: ['Required'] } })
 ```
 
-Callbacks are optional. An error event without a message becomes `Unknown error`. `onRequest` gets `{ resource, method, payload }`, `onSuccess` gets `{ resource, method, data }` and `onError` gets `{ message, errors, status, kind, resource, method }` when the emitter sends them, as nexdk does. `kind` is `timeout`, `abort`, `network` or `http`; the first three come with `status` 0. Other payloads stay `unknown` until your code narrows them.
+Callbacks are optional. An error event without a message becomes `Unknown error`. `onRequest` gets `{ resource, method, payload }`, `onSuccess` gets `{ resource, method, data }` (a non-object payload arrives as `{ payload }` or `{ data }`, a missing one as `{}`) and `onError` gets `{ message, errors, status, kind, resource, method }` when the emitter sends them, as nexdk does. `kind` is `timeout`, `abort`, `network` or `http`; the first three come with `status` 0. Other payloads stay `unknown` until your code narrows them.
+
+**Breaking change** (since the call context commit): `onSuccess` used to receive the raw payload, it now receives a `SuccessContext`. A handler written as `onSuccess: (data) => ...` for a non-nexdk emitter must read `data.data` for a non-object payload.
 
 Every payload is [redacted](/beepr/guides/redaction/) before the callback runs.
 
