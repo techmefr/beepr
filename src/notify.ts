@@ -1,3 +1,4 @@
+import { errorContext, requestContext, successContext } from './context.ts'
 import { createRedactor } from './redact.ts'
 import type { DebugEntry, ErrorContext, RequestContext, SdkEvent, SdkEventHandler, SuccessContext } from './types.ts'
 
@@ -34,30 +35,20 @@ function redactFieldErrors(
     return result
 }
 
-function errorContext(error: Record<string, unknown>, errors: Record<string, string[]> | undefined): ErrorContext {
-    const context: ErrorContext = { message: (error.message as string | undefined) ?? 'Unknown error', errors }
-    if (typeof error.status === 'number') context.status = error.status
-    if (typeof error.kind === 'string') context.kind = error.kind as ErrorContext['kind']
-    if (typeof error.resource === 'string') context.resource = error.resource
-    if (typeof error.method === 'string') context.method = error.method
-    return context
-}
-
 export function createNotify(adapter: SdkNotifyAdapter, options: NotifyOptions = {}): SdkEventHandler {
     const redactor = createRedactor(options.redactKeys)
     const redact = options.redact === false ? (value: unknown): unknown => value : redactor
 
     return (event: SdkEvent, rawData?: unknown) => {
         if (event === 'request') {
-            const context = (redact(rawData) as RequestContext | undefined) ?? {}
-            adapter.onRequest?.(context)
+            adapter.onRequest?.(requestContext(redact(rawData)))
         }
         if (event === 'success') {
-            adapter.onSuccess?.(redact(rawData) as SuccessContext)
+            adapter.onSuccess?.(successContext(redact(rawData)))
         }
         if (event === 'error') {
             const { errors, ...rest } = (rawData ?? {}) as { errors?: Record<string, string[]> }
-            adapter.onError?.(errorContext((redact(rest) ?? {}) as Record<string, unknown>, redactFieldErrors(errors, redact)))
+            adapter.onError?.(errorContext(redact(rest), redactFieldErrors(errors, redact)))
         }
         if (event === 'data') {
             adapter.onData?.(redact(rawData))
